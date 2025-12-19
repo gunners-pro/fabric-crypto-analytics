@@ -22,7 +22,30 @@
 
 # CELL ********************
 
-print("Bronze ingestion notebook created")
+import requests
+import json
+from datetime import datetime
+from requests import Response
+
+API_URL = "https://api.coingecko.com/api/v3/coins/markets"
+PARAMS = {
+    "vs_currency": "usd",
+    "order": "market_cap_desc",
+    "per_page": 50,
+    "page": 1
+}
+
+response: Response = requests.get(API_URL, params=PARAMS)
+response.raise_for_status()
+
+data = response.json()
+
+now = datetime.utcnow()
+path = f"Files/bronze/crypto/{now:%Y/%m/%d}/crypto_{now:%H%M%S}.json"
+
+notebookutils.fs.put(path, json.dumps(data),True)
+
+print(f"Bronze data written to {path}")
 
 # METADATA ********************
 
